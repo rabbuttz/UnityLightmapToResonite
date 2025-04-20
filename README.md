@@ -37,7 +37,7 @@ The **Unlit Lightmap Generator** converts Unity baked‑lightmap objects into 
 6. The tool creates a new GameObject named `<TargetRoot>_UnlitLM_Group` containing the unlit meshes.
 
 ### Export & Import to Resonite
-1. **Install UniGLTF** – download the latest `UniGLTF‑*.unitypackage` from the [official repository](https://github.com/ousttrue/UniGLTF) or grab v1.27 directly: <https://github.com/ousttrue/UniGLTF/releases/download/v1.27/UniGLTF-1.27.unitypackage>.
+1. **Install UniVRM** – download the latest `UniVRM‑*.unitypackage` from the [official repository]([https://github.com/ousttrue/UniGLTF](https://github.com/vrm-c/UniVRM)) or grab v0.128.3 directly: <https://github.com/vrm-c/UniVRM/releases/download/v0.128.3/UniVRM-0.128.3_b045.unitypackage>.
 2. In Unity, use **UniGLTF ▸ Export** to export the generated lightmap meshes.  
    • If you also want the *original* shaded meshes, select both the original meshes and the generated lightmap meshes before exporting.
 3. Import the resulting **.glb** file(s) into Resonite.
@@ -110,7 +110,7 @@ MIT License – see `LICENSE` file.
 6. `<TargetRoot>_UnlitLM_Group` という新しい GameObject に結果が生成されます。
 
 ### Resonite へのエクスポート手順
-1. **UniGLTF をインストール** — [公式リポジトリ](https://github.com/ousttrue/UniGLTF) から最新 `UniGLTF‑*.unitypackage` を取得するか、v1.27 を直接ダウンロード: <https://github.com/ousttrue/UniGLTF/releases/download/v1.27/UniGLTF-1.27.unitypackage>。
+1. **UniVRM をインストール** — [公式リポジトリ]([https://github.com/ousttrue/UniGLTF](https://github.com/vrm-c/UniVRM)) から最新 `UniVRM‑*.unitypackage` を取得するか、v0.128.3 を直接ダウンロード: <https://github.com/vrm-c/UniVRM/releases/download/v0.128.3/UniVRM-0.128.3_b045.unitypackage>。
 2. Unity で **UniGLTF ▸ Export** を実行し、生成されたライトマップメッシュを glb で出力。  
    • *元のメッシュ* も一緒に使いたい場合は、ライトマップメッシュと元メッシュの両方を選択してエクスポートします。
 3. 出力された **.glb** を Resonite にインポート。

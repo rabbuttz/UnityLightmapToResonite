@@ -24,6 +24,7 @@ namespace ResoniteTools
         // Configuration Options
         private GameObject targetRoot;
         private float vertexOffset = 0.001f;
+        private bool enableVertexOffset = true; // 頂点オフセット処理を有効/無効にするフラグ
         private bool groupGeneratedObjects = true;
         private string groupSuffix = "_UnlitLM_Group";
         private string objectSuffix = "_UnlitLM";
@@ -119,9 +120,15 @@ namespace ResoniteTools
             if (showAdvancedOptions)
             {
                 EditorGUI.indentLevel++;
-                vertexOffset = EditorGUILayout.Slider(φ("Vertex Offset", "頂点オフセット"), vertexOffset, 0.0001f, 0.02f);
-                vertexOffsetMode = (VertexOffsetMode)EditorGUILayout.EnumPopup(φ("Offset Mode", "オフセットモード"), vertexOffsetMode);
-                recalcNormalsFirst = EditorGUILayout.Toggle(φ("Recalculate Normals First", "法線を先に再計算"), recalcNormalsFirst);
+                enableVertexOffset = EditorGUILayout.ToggleLeft(φ("Enable Vertex Offset", "頂点オフセットを有効にする"), enableVertexOffset);
+                if (enableVertexOffset)
+                {
+                    EditorGUI.indentLevel++;
+                    vertexOffset = EditorGUILayout.Slider(φ("Vertex Offset", "頂点オフセット"), vertexOffset, 0.0001f, 0.02f);
+                    vertexOffsetMode = (VertexOffsetMode)EditorGUILayout.EnumPopup(φ("Offset Mode", "オフセットモード"), vertexOffsetMode);
+                    recalcNormalsFirst = EditorGUILayout.Toggle(φ("Recalculate Normals First", "法線を先に再計算"), recalcNormalsFirst);
+                    EditorGUI.indentLevel--;
+                }
                 shareMaterials = EditorGUILayout.ToggleLeft(φ("Share Materials (same lightmap)", "マテリアルを共有 (同じライトマップ)"), shareMaterials);
                 addNoise = EditorGUILayout.ToggleLeft(φ("Add Dither Noise", "ディザノイズを追加"), addNoise);
                 if (addNoise)
@@ -806,31 +813,42 @@ namespace ResoniteTools
             Vector3[] v = m.vertices;
             Vector3[] n = m.normals;
             
-            // ── 1. "元の法線" が信用できないならリセット
-            if (vertexOffsetMode == VertexOffsetMode.RelativeToScale && recalcNormalsFirst)
-                m.RecalculateNormals();
-                
-            // Get updated normals if needed
-            if (recalcNormalsFirst)
-                n = m.normals;
-                
-            for (int i = 0; i < v.Length; ++i)
+            // 頂点オフセットが有効な場合のみ頂点を法線方向に動かす処理を実行
+            if (enableVertexOffset)
             {
-                // ── 2. ローカル→ワールドへ
-                Vector3 wPos = renderer.transform.TransformPoint(v[i]);
-                Vector3 wNrm = renderer.transform.TransformDirection(n[i]).normalized;
+                // ── 1. "元の法線" が信用できないならリセット
+                if (vertexOffsetMode == VertexOffsetMode.RelativeToScale && recalcNormalsFirst)
+                    m.RecalculateNormals();
+                    
+                // Get updated normals if needed
+                if (recalcNormalsFirst)
+                    n = m.normals;
+                    
+                for (int i = 0; i < v.Length; ++i)
+                {
+                    // ── 2. ローカル→ワールドへ
+                    Vector3 wPos = renderer.transform.TransformPoint(v[i]);
+                    Vector3 wNrm = renderer.transform.TransformDirection(n[i]).normalized;
+                    
+                    // ── 3. ワールド空間で mm 単位オフセット
+                    wPos += wNrm * vertexOffset; // ← scaleFactor いらない
+                    
+                    // ── 4. ローカルへ戻す
+                    v[i] = renderer.transform.InverseTransformPoint(wPos);
+                }
                 
-                // ── 3. ワールド空間で mm 単位オフセット
-                wPos += wNrm * vertexOffset; // ← scaleFactor いらない
-                
-                // ── 4. ローカルへ戻す
-                v[i] = renderer.transform.InverseTransformPoint(wPos);
+                m.vertices = v;
             }
             
-            m.vertices = v;
             m.uv = MakeUV1FromUV2(original.uv2, lmSO);
             m.RecalculateBounds();
-            m.RecalculateNormals(); // 押し出し後にもう一度
+            
+            // 頂点オフセットが有効な場合のみ法線を再計算
+            if (enableVertexOffset)
+            {
+                m.RecalculateNormals(); // 押し出し後にもう一度
+            }
+            
             return m;
         }
         

@@ -19,6 +19,7 @@ namespace ResoniteTools
         private GameObject targetRoot;
         private bool processRecursively = true;
         private float vertexOffset = 0.001f;
+        private bool enableVertexOffset = true; // 頂点オフセット処理を有効/無効にするフラグ
         private bool autoExport = false;
         private ExportFormat exportFormat = ExportFormat.GLTF;   // ← 既定値を GLTF
         private string exportPath = "";
@@ -72,8 +73,14 @@ namespace ResoniteTools
             // --- Advanced ----------------------------------------------------
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("Advanced Settings", EditorStyles.boldLabel);
-            vertexOffset = EditorGUILayout.Slider("Vertex Offset", vertexOffset, 0.0001f, 0.02f);
-            vertexOffsetMode = (VertexOffsetMode)EditorGUILayout.EnumPopup("Offset Mode", vertexOffsetMode);
+            enableVertexOffset = EditorGUILayout.Toggle("Enable Vertex Offset", enableVertexOffset);
+            if (enableVertexOffset)
+            {
+                EditorGUI.indentLevel++;
+                vertexOffset = EditorGUILayout.Slider("Vertex Offset", vertexOffset, 0.0001f, 0.02f);
+                vertexOffsetMode = (VertexOffsetMode)EditorGUILayout.EnumPopup("Offset Mode", vertexOffsetMode);
+                EditorGUI.indentLevel--;
+            }
 
             // Mesh Optimization section
             EditorGUILayout.Space(3);
@@ -227,6 +234,7 @@ namespace ResoniteTools
                 
                 Set("targetRoot", targetRoot);
                 Set("vertexOffset", vertexOffset);
+                Set("enableVertexOffset", enableVertexOffset);
                 Set("processRecursively", processRecursively);
                 
                 // Use enum name-based conversion instead of direct casting

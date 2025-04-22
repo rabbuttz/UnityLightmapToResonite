@@ -70,6 +70,9 @@ Enable **Verbose Logging** to see step‑by‑step progress. The tool will outp
 - URP/HDRP materials are converted but the appearance may differ.
 - Only the built‑in *Unlit/Texture*, *Unlit/Transparent*, and a minimal *Cutout* shader are generated.
 
+### Important Note on Z-Fighting
+**It is recommended to avoid using the Vertex Offset feature.** Instead, adjust the `OffsetFactor` value within Resonite to prevent Z-fighting. The Vertex Offset feature is planned to be removed in future versions.
+
 ### License
 MIT License – see `LICENSE` file.
 
@@ -142,6 +145,9 @@ MIT License – see `LICENSE` file.
 - SkinnedMeshRenderer でのボーン最適化は未実装
 - URP/HDRP 素材は見た目が多少変わる場合あり
 - 生成されるシェーダは Unlit 系最小構成
+
+### Z-ファイト防止に関する重要な注意
+**頂点オフセット機能の使用は推奨されていません。** 代わりに、Resonite内で `OffsetFactor` の値を調整することでZ-ファイトを防止してください。頂点オフセット機能は将来のバージョンで削除される予定です。
 
 ### ライセンス
 MIT License

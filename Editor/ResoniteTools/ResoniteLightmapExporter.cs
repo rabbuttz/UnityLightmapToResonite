@@ -19,7 +19,7 @@ namespace ResoniteTools
         private GameObject targetRoot;
         private bool processRecursively = true;
         private float vertexOffset = 0.001f;
-        private bool enableVertexOffset = true; // 頂点オフセット処理を有効/無効にするフラグ
+        private bool enableVertexOffset = false; // 頂点オフセット処理を有効/無効にするフラグ
         private bool autoExport = false;
         private ExportFormat exportFormat = ExportFormat.GLTF;   // ← 既定値を GLTF
         private string exportPath = "";
@@ -30,7 +30,7 @@ namespace ResoniteTools
         private bool optimizeMeshes = true;
         private bool combineByLightmapMaterial = true; // 同じライトマップを参照するメッシュを結合
         private bool exportLightmapTextures = true;
-        private int  maxLightmapSize = 2048;
+        private int  maxLightmapSize = 4096;
         private bool useCustomShader = true;
 
         // Generator‑specific options -----------------------------------------
@@ -55,7 +55,7 @@ namespace ResoniteTools
         
         // ★★★ 追加列挙 ----------
         private UnlitLightmapUtilities.LightmapExportFormat texFormat =
-            UnlitLightmapUtilities.LightmapExportFormat.PNG;
+            UnlitLightmapUtilities.LightmapExportFormat.EXR32;
 
         // --------------------------------------------------------------------
         [MenuItem("Tools/Resonite Lightmap Processor")]
@@ -73,13 +73,19 @@ namespace ResoniteTools
             // --- Advanced ----------------------------------------------------
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("Advanced Settings", EditorStyles.boldLabel);
-            enableVertexOffset = EditorGUILayout.Toggle("Enable Vertex Offset", enableVertexOffset);
+            enableVertexOffset = EditorGUILayout.Toggle("Enable Vertex Offset (Deprecated)", enableVertexOffset);
             if (enableVertexOffset)
             {
                 EditorGUI.indentLevel++;
                 vertexOffset = EditorGUILayout.Slider("Vertex Offset", vertexOffset, 0.0001f, 0.02f);
                 vertexOffsetMode = (VertexOffsetMode)EditorGUILayout.EnumPopup("Offset Mode", vertexOffsetMode);
                 EditorGUI.indentLevel--;
+            }
+            else
+            {
+                EditorGUILayout.HelpBox(
+                    "This feature is being deprecated. Instead, adjust the Offset Factor in Resonite material to -0.1 or other negative value.\n\nこの機能は廃止予定です。代わりにResonite内でマテリアルのOffset Factorを-0.1などの負の値に調整してください。", 
+                    MessageType.Info);
             }
 
             // Mesh Optimization section
@@ -121,12 +127,16 @@ namespace ResoniteTools
             maxLightmapSize = EditorGUILayout.IntPopup(
                 "Max Lightmap Size",
                 maxLightmapSize,
-                new[] { "256", "512", "1024", "2048", "4096" },
-                new[] { 256, 512, 1024, 2048, 4096 });
+                new[] { "256", "512", "1024", "2048", "4096", "8192" },
+                new[] { 256, 512, 1024, 2048, 4096, 8192 });
 
             texFormat = (UnlitLightmapUtilities.LightmapExportFormat)EditorGUILayout.EnumPopup(
                 "Texture Format",
                 texFormat);
+
+            EditorGUILayout.HelpBox(
+                "Resonite内のテクスチャの設定で、PreferredFormatをBC7_LZMAかBC6H_LZMAにしてください。\nIn Resonite, please set the PreferredFormat of the texture to BC7_LZMA or BC6H_LZMA.",
+                MessageType.Info);
 
             // Noise options
             addNoise = EditorGUILayout.Toggle("Add Dither Noise", addNoise);

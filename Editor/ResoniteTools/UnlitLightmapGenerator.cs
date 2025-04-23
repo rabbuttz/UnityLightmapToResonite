@@ -24,7 +24,7 @@ namespace ResoniteTools
         // Configuration Options
         private GameObject targetRoot;
         private float vertexOffset = 0.001f;
-        private bool enableVertexOffset = true; // 頂点オフセット処理を有効/無効にするフラグ
+        private bool enableVertexOffset = false; // 頂点オフセット処理を有効/無効にするフラグ（廃止予定）
         private bool groupGeneratedObjects = true;
         private string groupSuffix = "_UnlitLM_Group";
         private string objectSuffix = "_UnlitLM";
@@ -41,7 +41,7 @@ namespace ResoniteTools
         private string debugSavePath = "Assets/Debug/Lightmaps";
         
         // ★★★ テクスチャ出力設定
-        private int maxLightmapSize = 2048;
+        private int maxLightmapSize = 4096;
         private enum LightmapExportFormat { PNG, EXR16, EXR32 }
         private LightmapExportFormat texFormat = LightmapExportFormat.PNG;
 
@@ -120,7 +120,7 @@ namespace ResoniteTools
             if (showAdvancedOptions)
             {
                 EditorGUI.indentLevel++;
-                enableVertexOffset = EditorGUILayout.ToggleLeft(φ("Enable Vertex Offset", "頂点オフセットを有効にする"), enableVertexOffset);
+                enableVertexOffset = EditorGUILayout.ToggleLeft(φ("Enable Vertex Offset (Deprecated)", "頂点オフセットを有効にする（廃止予定）"), enableVertexOffset);
                 if (enableVertexOffset)
                 {
                     EditorGUI.indentLevel++;
@@ -163,8 +163,8 @@ namespace ResoniteTools
                 maxLightmapSize = EditorGUILayout.IntPopup(
                     φ("Max Lightmap Size", "最大ライトマップサイズ"),
                     maxLightmapSize,
-                    new[] { "256", "512", "1024", "2048", "4096" },
-                    new[] { 256, 512, 1024, 2048, 4096 });
+                    new[] { "256", "512", "1024", "2048", "4096", "8192" },
+                    new[] { 256, 512, 1024, 2048, 4096, 8192 });
 
                 texFormat = (LightmapExportFormat)EditorGUILayout.EnumPopup(
                     φ("Texture Format", "テクスチャ形式"),
@@ -594,16 +594,10 @@ namespace ResoniteTools
                             }
                         }
                         
-                        // アセットとして保存（テストのため）
-                        try {
-                            string assetPath = $"{debugSavePath}/lightmap_{i}_asset.asset";
-                            AssetDatabase.CreateAsset(readableCopy, assetPath);
-                            AssetDatabase.SaveAssets();
-                            Debug.Log($"Lightmap texture saved as asset: {assetPath}");
-                        }
-                        catch (System.Exception e) {
-                            Debug.LogError($"Error saving lightmap as asset: {e.Message}");
-                            // 使用後破棄
+                        // キャッシュに入れるか破棄する
+                        if (!readableLightmapCache.ContainsKey(i)) {
+                            readableLightmapCache[i] = readableCopy;
+                        } else {
                             Object.DestroyImmediate(readableCopy);
                         }
                     }
@@ -690,6 +684,7 @@ namespace ResoniteTools
             RenderTexture.active = rt;
 
             Texture2D readable = new Texture2D(width, height, dstFmt, false, true);
+            readable.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
             readable.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
             readable.Apply();
 
@@ -1183,6 +1178,35 @@ namespace ResoniteTools
             {
                 Undo.DestroyObjectImmediate(t.gameObject);
             }
+        }
+
+        // キャッシュをクリアするメソッド（OnDestroy時に呼び出すなど）
+        private void ClearCaches()
+        {
+            // マテリアルキャッシュをクリア
+            foreach (var material in materialCache.Values)
+            {
+                if (material != null)
+                {
+                    Object.DestroyImmediate(material);
+                }
+            }
+            materialCache.Clear();
+            
+            // テクスチャキャッシュをクリア
+            foreach (var texture in readableLightmapCache.Values)
+            {
+                if (texture != null)
+                {
+                    Object.DestroyImmediate(texture);
+                }
+            }
+            readableLightmapCache.Clear();
+        }
+        
+        private void OnDestroy()
+        {
+            ClearCaches();
         }
     }
 }

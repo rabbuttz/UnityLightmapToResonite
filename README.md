@@ -1,7 +1,7 @@
 # UnityLightmapToResonite
 
 ---
-## 🇬🇧 English
+## 🇬🇧 English(日本語説明は下にあります)
 
 ### Overview
 The **Unlit Lightmap Generator** converts Unity baked‑lightmap objects into UV1‑based *unlit* meshes that can be used on platforms that **do not support secondary lightmap UVs (UV2)**—for example **Resonite**.

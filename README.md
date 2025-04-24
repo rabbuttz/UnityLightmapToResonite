@@ -25,6 +25,13 @@ The **Unlit Lightmap Generator** converts Unity baked‑lightmap objects into UV
 1. Copy the `ResoniteTools` folder (or the individual `*.cs` files) into **`Assets/Editor/`** in your Unity project.
 2. Wait for Unity to re‑compile; a new menu item **Tools ▸ Generate Unlit Lightmap Objects** will appear.
 
+**Alternative Installation (Recommended)**
+1. Download the latest `.unitypackage` from the [GitHub Releases](https://github.com/rabbuttz/UnityLightmapToResonite/releases/) page.
+2. Open your Unity project.
+3. Double-click the downloaded `.unitypackage` file to import it into your project.
+4. Click "Import" in the dialog that appears.
+5. Wait for Unity to re‑compile; a new menu item **Tools ▸ Generate Unlit Lightmap Objects** will appear.
+
 ### Usage – Quick Start
 1. Bake lighting in Unity as usual.
 2. Select a root GameObject that contains the baked meshes.
@@ -102,6 +109,13 @@ MIT License – see `LICENSE` file.
 ### インストール手順
 1. `ResoniteTools` フォルダ（または *.cs ファイル一式）を **`Assets/Editor/`** にコピー。
 2. Unity のコンパイル完了後、メニュー **Tools ▸ Generate Unlit Lightmap Objects** が追加されます。
+
+**代替インストール方法（推奨）**
+1. [GitHub Releases](https://github.com/rabbuttz/UnityLightmapToResonite/releases/) ページから最新の `.unitypackage` をダウンロード。
+2. Unityプロジェクトを開く。
+3. ダウンロードした `.unitypackage` ファイルをダブルクリックしてプロジェクトにインポート。
+4. 表示されるダイアログで「Import」をクリック。
+5. Unity のコンパイル完了後、メニュー **Tools ▸ Generate Unlit Lightmap Objects** が追加されます。
 
 ### 使い方
 1. Unity でライトマップをベイク。
